@@ -36,7 +36,7 @@ html {
 }
 .App .main .recipe-list-box {
   width: 70rem;
-  background: #039be5;
+  background:  #94ad73;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -44,7 +44,7 @@ html {
   padding: 1rem;
   margin-bottom: 1rem;
   border-radius: 0.25rem;
-  box-shadow: 0.1rem 0.1rem 1rem 0.1rem #039be5;
+  box-shadow: 0.1rem 0.1rem 1rem 0.1rem  #94ad73;
 }
 .App .main .recipe-list-box .no-recipes {
   color: #fff;
@@ -112,8 +112,8 @@ html {
 }
 .App .main .pagination .selected-page {
   background: #fff;
-  color: #039be5;
-  border: 0.1rem solid #039be5;
+  color: #94ad73;
+  border: 0.1rem solid  #94ad73;
 }
 .add-edit-recipe-form-container {
   display: flex;
@@ -240,7 +240,7 @@ html {
   margin-bottom: 0.5rem;
 }
 .primary-button {
-  background: #039be5;
+  background:  #94ad73;
   color: #fff;
   border: 0.1rem solid transparent;
   outline: none;
@@ -248,8 +248,8 @@ html {
 .primary-button:hover {
   opacity: 0.9;
   background: #fff;
-  color: #039be5;
-  border: 0.1rem solid #039be5;
+  color:  #94ad73;
+  border: 0.1rem solid  #94ad73;
 }
 .secondary-button {
   background: #e78936;
