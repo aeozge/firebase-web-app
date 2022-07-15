@@ -1,5 +1,5 @@
 import "./App.css";
-import { useState, useEffect, startTransition } from "react";
+import { useState, useEffect } from "react";
 import FirebaseAuthService from "./FirebaseAuthService";
 
 import LoginForm from "./components/LoginForm";
@@ -201,9 +201,8 @@ function App() {
 
         handleFetchRecipes();
 
-        startTransition(() => {
           setCurrentRecipe(null);
-        });
+       
 
         window.scrollTo(0, 0);
 
