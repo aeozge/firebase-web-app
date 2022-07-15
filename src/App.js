@@ -15,8 +15,9 @@ function App() {
   const [categoryFilter, setCategoryFilter] = useState("");
 
   const [orderByN, setOrderByN] = useState("");
-  // const [orderBy, setOrderBy] = useState('');
   const [recipesPerPage, setRecipesPerPage] = useState(3);
+
+  const [inputText, setInputText] = useState("");
 
   useEffect(() => {
     setIsLoading(true);
@@ -54,10 +55,8 @@ function App() {
     }
   }
 
-
   async function fetchRecipes() {
     const queries = [];
-
 
     if (!user) {
       queries.push({
@@ -91,22 +90,6 @@ function App() {
       }
     }
 
-    // const orderByField = 'publishDate';
-
-    // if (orderBy) {
-    //   switch (orderBy) {
-    //     case 'publishDateAsc':
-    //       orderByDirection = 'asc';
-    //       break;
-    //     case 'publishDateDesc':
-    //       orderByDirection = 'desc';
-    //       break;
-    //     default:
-    //       break;
-    //   }
-    // }
-
-
     let fetchedRecipes = [];
     try {
       const response = await FirebaseFirestoreService.readDocument({
@@ -115,8 +98,6 @@ function App() {
         orderByDirection: orderByDirection,
         orderByName: orderByName,
         perPage: recipesPerPage,
-       
-        // orderByField: orderByField,
       });
       const newRecipes = response.docs.map((recipeDoc) => {
         const id = recipeDoc.id;
@@ -132,20 +113,12 @@ function App() {
     return fetchedRecipes;
   }
 
-
   function handleRecipesPerPageChange(event) {
     const recipesPerPage = event.target.value;
 
     setRecipes([]);
     setRecipesPerPage(recipesPerPage);
   }
-
-  // function handleLoadMoreRecipesClick() {
-  //   const lastRecipe = recipes[recipes.length - 1];
-  //   const cursorId = lastRecipe.id;
-
-  //   handleFetchRecipes(cursorId);
-  // }
 
   async function handleFetchRecipes() {
     try {
@@ -201,8 +174,7 @@ function App() {
 
         handleFetchRecipes();
 
-          setCurrentRecipe(null);
-       
+        setCurrentRecipe(null);
 
         window.scrollTo(0, 0);
 
@@ -236,144 +208,156 @@ function App() {
     return dateString;
   }
 
-return (
-  <div className="App">
-    <div className="title-row">
-      <h1 className="title">Firebase Recipes</h1>
-      <LoginForm existingUser={user}></LoginForm>
-    </div>
-    <div className="main">
-      <div className="row filters">
-        <label className="recipe-label input-label">
-          Category:
-          <select
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-            className="select"
-            required
-          >
-            <option value=""></option>
-            <option value="breadsSandwichesAndPizza">
-              Breads, Sandwiches, and Pizza
-            </option>
-            <option value="eggsAndBreakfast">Eggs & Breakfast</option>
-            <option value="dessertsAndBakedGoods">
-              Desserts & Baked Goods
-            </option>
-            <option value="fishAndSeafood">Fish & Seafood</option>
-            <option value="vegetables">Vegetables</option>
-          </select>
-        </label>
-        <label className="input-label">
-          <select
-            value={orderByN}
-            onChange={(e) => setOrderByN(e.target.value)}
-            className="select"
-          >
-            <option value="nameDesc">Name (desc)</option>
-            <option value="nameAsc">Name (asc)</option>
-          </select>
-        </label>
-        {/* <label className="input-label">
-            <select
-              value={orderBy}
-              onChange={(e) => setOrderBy(e.target.value)}
-              className="select"
-            >
-              <option value="publishDateDesc">
-                Publish Date (newest - oldest)
-              </option>
-              <option value="publishDateAsc">
-                Publish Date (oldest - newest)
-              </option>
-            </select>
-          </label> */}
+  //SEARCH
+
+  console.log(
+    "recipes name : ",
+    recipes.map((recipe) => recipe.name)
+  );
+
+  let inputHandler = (e) => {
+    //convert input text to lower case
+    var lowerCase = e.target.value.toLowerCase();
+    setInputText(lowerCase);
+  };
+  const filteredData = recipes.filter((el) => {
+    if (inputText === "") {
+      return el;
+    } else {
+      return el.name.toLowerCase().includes(inputText);
+    }
+  });
+
+  return (
+    <div className="App">
+      <div className="title-row">
+        <h1 className="title">Firebase Recipes</h1>
+        <LoginForm existingUser={user}></LoginForm>
       </div>
-      <div className="center">
-        <div className="recipe-list-box">
-          {isLoading ? (
-            <div className="fire">
-              <div className="flames">
-                <div className="flame"></div>
-                <div className="flame"></div>
-                <div className="flame"></div>
-                <div className="flame"></div>
-              </div>
-              <div className="logs"></div>
-            </div>
-          ) : null}
-          {!isLoading && recipes && recipes.length === 0 ? (
-            <h5 className="no-recipes">No Recipes Found</h5>
-          ) : null}
-          {!isLoading && recipes && recipes.length > 0 ? (
-            <div className="recipe-list">
-              {recipes.map((recipe) => {
-                return (
-                  <div className="recipe-card" key={recipe.id}>
-                    {recipe.isPublished === false ? (
-                      <div className="unpublished">UNPUBLISHED</div>
-                    ) : null}
-                    <div className="recipe-name">{recipe.name}</div>
-                    <div className="recipe-image-box">
-                      {recipe.imageUrl ? (
-                        <img
-                          src={recipe.imageUrl}
-                          alt={recipe.name}
-                          className="recipe-image"
-                        />
-                      ) : null}
-                    </div>
-                    <div className="recipe-field">
-                      Category: {lookupCategoryLabel(recipe.category)}
-                    </div>
-                    <div className="recipe-field">
-                      Publish Date: {formatDate(recipe.publishDate)}
-                    </div>
-                    {user ? (
-                      <button
-                        type="button"
-                        onClick={() => handleEditRecipeClick(recipe.id)}
-                        className="primary-button edit-button"
-                      >
-                        EDIT
-                      </button>
-                    ) : null}
-                  </div>
-                );
-              })}
-            </div>
-          ) : null}
+
+      <div>
+        <h1>SEARCH</h1>
+        <div className="search">
+          <input type="text" onChange={inputHandler} />
         </div>
+
+        <ul>
+          {filteredData.map((item) => (
+            <li key={item.id}>{item.name}</li>
+          ))}
+        </ul>
       </div>
-      {isLoading || (recipes && recipes.length > 0) ? (
-        <>
-          <label className="input-label">
-            Recipes Per Page:
+
+      <div className="main">
+        <div className="row filters">
+          <label className="recipe-label input-label">
+            Category:
             <select
-              value={recipesPerPage}
-              onChange={handleRecipesPerPageChange}
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
               className="select"
+              required
             >
-              <option value="3">3</option>
-              <option value="6">6</option>
-              <option value="9">9</option>
+              <option value=""></option>
+              <option value="breadsSandwichesAndPizza">
+                Breads, Sandwiches, and Pizza
+              </option>
+              <option value="eggsAndBreakfast">Eggs & Breakfast</option>
+              <option value="dessertsAndBakedGoods">
+                Desserts & Baked Goods
+              </option>
+              <option value="fishAndSeafood">Fish & Seafood</option>
+              <option value="vegetables">Vegetables</option>
             </select>
           </label>
-         <br></br>
-        </>
-      ) : null}
-      {user ? (
-        <AddEditRecipeForm
-          existingRecipe={currentRecipe}
-          handleAddRecipe={handleAddRecipe}
-          handleUpdateRecipe={handleUpdateRecipe}
-          handleDeleteRecipe={handleDeleteRecipe}
-          handleEditRecipeCancel={handleEditRecipeCancel}
-        ></AddEditRecipeForm>
-      ) : null}
+          <label className="input-label">
+            <select
+              value={orderByN}
+              onChange={(e) => setOrderByN(e.target.value)}
+              className="select"
+            >
+              <option value="nameDesc">Name (desc)</option>
+              <option value="nameAsc">Name (asc)</option>
+            </select>
+          </label>
+        </div>
+        <div className="center">
+          <div className="recipe-list-box">
+            {isLoading ? (
+              <div className="fire">
+                <div className="flames">
+                  <div className="flame"></div>
+                  <div className="flame"></div>
+                  <div className="flame"></div>
+                  <div className="flame"></div>
+                </div>
+                <div className="logs"></div>
+              </div>
+            ) : null}
+            {!isLoading && recipes && recipes.length === 0 ? (
+              <h5 className="no-recipes">No Recipes Found</h5>
+            ) : null}
+            {!isLoading && recipes && recipes.length > 0 ? (
+              <div className="recipe-list">
+                {recipes.map((recipe) => {
+                  return (
+                    <div className="recipe-card" key={recipe.id}>
+                      {recipe.isPublished === false ? (
+                        <div className="unpublished">UNPUBLISHED</div>
+                      ) : null}
+                      <div className="recipe-name">{recipe.name}</div>
+                
+                      <div className="recipe-field">
+                        Category: {lookupCategoryLabel(recipe.category)}
+                      </div>
+                      <div className="recipe-field">
+                        Publish Date: {formatDate(recipe.publishDate)}
+                      </div>
+                      {user ? (
+                        <button
+                          type="button"
+                          onClick={() => handleEditRecipeClick(recipe.id)}
+                          className="primary-button edit-button"
+                        >
+                          EDIT
+                        </button>
+                      ) : null}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : null}
+          </div>
+        </div>
+        {isLoading || (recipes && recipes.length > 0) ? (
+          <>
+            <label className="input-label">
+              Recipes Per Page:
+              <select
+                value={recipesPerPage}
+                onChange={handleRecipesPerPageChange}
+                className="select"
+              >
+                <option value="3">3</option>
+                <option value="6">6</option>
+                <option value="9">9</option>
+              </select>
+            </label>
+            <br></br>
+          </>
+        ) : null}
+        {user ? (
+          <AddEditRecipeForm
+            existingRecipe={currentRecipe}
+            handleAddRecipe={handleAddRecipe}
+            handleUpdateRecipe={handleUpdateRecipe}
+            handleDeleteRecipe={handleDeleteRecipe}
+            handleEditRecipeCancel={handleEditRecipeCancel}
+          ></AddEditRecipeForm>
+        ) : null}
+      </div>
     </div>
-  </div>
-);
+  );
 }
 
 export default App;
